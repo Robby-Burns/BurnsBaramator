@@ -97,4 +97,6 @@ class LLMClient:
                 return json.loads(response_text)
         except json.JSONDecodeError:
             logger.error(f"Failed to parse JSON response: {response_text}")
-            raise ValueError("LLM did not return valid JSON.")
+            # Fallback: return empty dict or raise
+            # For robustness, let's try to fix common JSON errors or just return empty
+            return {}
