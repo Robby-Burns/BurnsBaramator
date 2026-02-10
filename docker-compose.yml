@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: burns-barometer
+    volumes:
+      - .:/app
+      - /app/.venv
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Keep container running for scheduler
+    command: python main.py

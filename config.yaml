@@ -1,0 +1,47 @@
+llm:
+  provider: "anthropic"  # or "openai"
+  model: "claude-3-5-sonnet-20240620"
+  temperature: 0.7
+
+database:
+  path: "jobs.db"
+  backup_interval_days: 7
+
+scout:
+  sources:
+    - "linkedin"
+    - "indeed"
+    - "careers_pages"
+  keywords:
+    - "Senior Product Manager"
+    - "Staff PM"
+    - "AI/ML Product"
+    - "Technical Product Manager"
+  locations:
+    - "Remote"
+    - "Seattle, WA"
+    - "Spokane, WA"
+  max_age_days: 15
+  rate_limit_seconds: 2
+
+barometer:
+  min_fit_score: 60
+  weight_seniority: 0.3
+  weight_tech_stack: 0.25
+  weight_domain_match: 0.25
+  weight_growth_opportunity: 0.2
+
+tribunal:
+  personas:
+    - "ATS Specialist"
+    - "Recruiter"
+    - "Hiring Manager"
+  min_approval_score: 90
+
+gatekeeper:
+  require_user_approval: true
+  show_comparison: true
+
+logging:
+  level: "INFO"
+  file: "storage/logs/barometer.log"

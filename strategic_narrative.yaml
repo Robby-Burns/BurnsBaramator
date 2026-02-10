@@ -1,0 +1,56 @@
+narratives:
+  - name: "AI Product Manager"
+    core_message: "I'm living the exact developer experience you're building infrastructure to solve."
+    themes:
+      - "20+ years of product management (operations + builder experience)"
+      - "Intentionally upskilled in AI/ML over the past year"
+      - "Building multi-agent systems and hitting friction points"
+      - "Safety-by-design: constraints as design primitives"
+    differentiation:
+      - "Operator who learned to build, not software PM pivoting to AI"
+      - "Understand business (20 years) and technical (recent master's + shipping systems)"
+
+  - name: "Senior Staff Product Engineer / AI Systems"
+    core_message: "I've shipped production AI systems end-to-end while managing complexity that most 'AI builders' don't encounter."
+    themes:
+      - "Full-stack builder: architecture -> deployment -> user validation"
+      - "Regulated environments (financial services)"
+      - "Safety-first engineering as competitive advantage"
+    differentiation:
+      - "Built systems requiring 100% accuracy"
+      - "Docker-based sandboxing for RCE mitigation"
+      - "Vendor-agnostic architecture"
+
+  - name: "Operations / Business Leadership"
+    core_message: "I've proven I can optimize complex systems, whether they're farms, breweries, or AI pipelines."
+    themes:
+      - "20+ years building and optimizing operational systems"
+      - "Data-driven experimentation"
+      - "Ecosystem management"
+      - "Scaling without proportional overhead increase"
+    differentiation:
+      - "Understand business unit incentives and constraints"
+      - "Proven ability to scale operations"
+      - "Run technology 'like a product'"
+
+  - name: "Technical / Engineering Leadership"
+    core_message: "I'm a builder who cares about safety, observability, and long-term maintainability—not just shipping."
+    themes:
+      - "Architecture-first thinking"
+      - "Security by design"
+      - "Production-ready code"
+      - "Strong typing and validation"
+
+technical_competencies:
+  high_confidence:
+    - "Agentic design patterns (multi-agent orchestration, consensus, debate)"
+    - "Safety-by-design (guardrails, sandboxing, audit trails)"
+    - "LangGraph, RAG, pgvector"
+    - "Python (FastAPI, Django, SQLAlchemy)"
+    - "Docker, REST APIs"
+    - "Product roadmap definition, Stakeholder management"
+  intermediate:
+    - "LiteLLM, Multi-LLM orchestration"
+    - "Async Python, Redis + Celery"
+    - "AWS, Terraform"
+    - "React/Next.js"
