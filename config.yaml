@@ -4,7 +4,13 @@ llm:
   temperature: 0.7
 
 database:
-  path: "jobs.db"
+  # If using SQLite (local):
+  # url: "sqlite:///jobs.db"
+  
+  # If using Neon/Postgres (production):
+  # url: "postgresql://user:pass@host:port/dbname"
+  
+  # Default fallback is env var DATABASE_URL
   backup_interval_days: 7
 
 scout:
