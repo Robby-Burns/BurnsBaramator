@@ -4,11 +4,11 @@ A persistent multi-agent system designed to find, filter, and apply for jobs aut
 
 ## 🚀 Features
 
-- **The Scout:** Web scraper (DuckDuckGo + Playwright) to find jobs across the web (not just LinkedIn/Indeed).
+- **The Scout:** Web scraper (DuckDuckGo + Playwright) to find jobs across the web.
 - **The Barometer:** Analyzes job fit against your Strategic Narrative (0-100% score).
-- **The Mirror:** Generates tailored resumes and cover letters using your Master Resume Source.
-- **The Tribunal:** Multi-persona review system (ATS, Recruiter, Hiring Manager) to critique and refine applications.
-- **The Gatekeeper:** Human-in-the-loop approval CLI to review and submit applications.
+- **The Mirror:** Generates tailored resumes and cover letters.
+- **The Tribunal:** Multi-persona review system to critique applications.
+- **The Gatekeeper:** Human-in-the-loop approval CLI.
 
 ## 🛠️ Setup
 
@@ -22,17 +22,12 @@ A persistent multi-agent system designed to find, filter, and apply for jobs aut
     Copy `.env.example` to `.env` and fill in your API keys.
     ```bash
     cp .env.example .env
-    # Edit .env with your ANTHROPIC_API_KEY and DATABASE_URL
     ```
 
 3.  **Install Dependencies**
     ```bash
     # Using uv (recommended)
     uv pip install -r requirements.txt
-    playwright install chromium
-    
-    # Or standard pip
-    pip install -r requirements.txt
     playwright install chromium
     ```
 
@@ -43,11 +38,7 @@ A persistent multi-agent system designed to find, filter, and apply for jobs aut
 
 ## ☁️ Deployment
 
-This system uses a **Worker + API** architecture.
-
-- **Worker (Scraper/AI):** Deploys to **Koyeb**, **Railway**, or **Fly.io** (Docker).
-- **API (Viewer):** Deploys to **Vercel** (Serverless).
-- **Database:** Uses **Neon** (PostgreSQL).
+Deploy the worker to **Railway** or **Fly.io**.
 
 See `docs/DEPLOYMENT.md` for full instructions.
 
@@ -62,14 +53,6 @@ docker-compose up --build
 ```bash
 python -m pytest
 ```
-
-## 📄 Documentation
-
-See the `docs/` folder for detailed specifications and guides:
-- `docs/DEPLOYMENT.md`: Deployment instructions for Koyeb, Railway, Vercel.
-- `docs/BURNS_BAROMETER_SPEC.md`: System architecture and design.
-- `docs/BURNS_MASTER_RESUME_SOURCE.md`: Source of truth for resume generation.
-- `docs/02_COMPLETE_GUIDE.md`: Framework methodology.
 
 ##  License
 

@@ -12,6 +12,4 @@ storage/resumes/*
 storage/cover_letters/*
 jobs.db
 # Ignore deployment configs in Docker build
-koyeb.yaml
 fly.toml
-vercel.json
