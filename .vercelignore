@@ -26,3 +26,6 @@ Dockerfile
 node_modules
 # Exclude heavy agent code not needed for the API
 agents/
+# Exclude uv config to force Vercel to use pip + requirements-vercel.txt
+pyproject.toml
+uv.lock
