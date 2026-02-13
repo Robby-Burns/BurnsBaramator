@@ -1,27 +1,23 @@
-app = "burns-barometer"
-primary_region = "sea"
+# fly.toml app configuration file generated for burnsbaramator on 2026-02-13T23:24:54Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'burnsbaramator'
+primary_region = 'ams'
 
 [build]
-  dockerfile = "Dockerfile"
 
-[env]
-  CLOUD_MODE = "true" # Triggers scheduler mode
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
 
-[[services]]
-  protocol = "tcp"
-  internal_port = 8000
-  processes = ["app"]
-
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-    force_https = true
-
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"]
-
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 25
-    soft_limit = 20
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256
