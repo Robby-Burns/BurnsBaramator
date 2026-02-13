@@ -1,0 +1,18 @@
+type: web
+name: burns-barometer
+env:
+  DATABASE_URL: 
+    value: "" # Set in Koyeb Dashboard
+  ANTHROPIC_API_KEY:
+    value: "" # Set in Koyeb Dashboard
+  CLOUD_MODE:
+    value: "true" # Triggers scheduler mode
+instance_type: nano
+regions:
+  - was
+routes:
+  - path: /
+    port: 8000
+build:
+  docker:
+    dockerfile: Dockerfile

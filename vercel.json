@@ -1,5 +1,5 @@
 {
-  "framework": "fastapi",
+  "buildCommand": "pip install -r requirements-vercel.txt",
   "rewrites": [
     { "source": "/(.*)", "destination": "api/index.py" }
   ]

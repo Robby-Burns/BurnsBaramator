@@ -1,6 +1,8 @@
 import logging
 import os
 import yaml
+import time
+import schedule
 from dotenv import load_dotenv
 from db.manager import DatabaseManager
 from utils.llm_client import LLMClient
@@ -87,12 +89,16 @@ class BurnsBarometer:
             except Exception as e:
                 logger.error(f"Tribunal cycle failed: {e}")
         
-        # 5. Gatekeeper (Interactive)
-        if self.gatekeeper:
-            try:
-                self.gatekeeper.request_approval()
-            except Exception as e:
-                logger.error(f"Gatekeeper session failed: {e}")
+        # 5. Gatekeeper (Interactive - only if running locally)
+        # On Cloud (Koyeb/Railway/Fly), we skip this blocking step and rely on the API to view results.
+        if os.getenv("CLOUD_MODE") is None:
+            if self.gatekeeper:
+                try:
+                    self.gatekeeper.request_approval()
+                except Exception as e:
+                    logger.error(f"Gatekeeper session failed: {e}")
+        else:
+            logger.info("Running in CLOUD_MODE: Skipping interactive Gatekeeper.")
         
         logger.info("=== Burns Barometer Cycle Complete ===")
     
@@ -100,10 +106,26 @@ class BurnsBarometer:
         """Close all connections."""
         self.db.close()
 
+def job():
+    barometer = BurnsBarometer()
+    barometer.run_full_cycle()
+    barometer.cleanup()
+
 if __name__ == "__main__":
     # Ensure storage directories exist
     os.makedirs("storage/logs", exist_ok=True)
     
-    barometer = BurnsBarometer()
-    barometer.run_full_cycle()
-    barometer.cleanup()
+    # If running on Cloud (Koyeb/Railway/Fly), use scheduler
+    if os.getenv("CLOUD_MODE"):
+        logger.info("Starting Scheduler for Cloud Mode...")
+        # Run once immediately
+        job()
+        # Then schedule every 6 hours
+        schedule.every(6).hours.do(job)
+        
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+    else:
+        # Local run
+        job()

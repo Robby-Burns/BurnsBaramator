@@ -22,7 +22,7 @@ A persistent multi-agent system designed to find, filter, and apply for jobs aut
     Copy `.env.example` to `.env` and fill in your API keys.
     ```bash
     cp .env.example .env
-    # Edit .env with your ANTHROPIC_API_KEY
+    # Edit .env with your ANTHROPIC_API_KEY and DATABASE_URL
     ```
 
 3.  **Install Dependencies**
@@ -41,6 +41,16 @@ A persistent multi-agent system designed to find, filter, and apply for jobs aut
     python main.py
     ```
 
+## ☁️ Deployment
+
+This system uses a **Worker + API** architecture.
+
+- **Worker (Scraper/AI):** Deploys to **Koyeb**, **Railway**, or **Fly.io** (Docker).
+- **API (Viewer):** Deploys to **Vercel** (Serverless).
+- **Database:** Uses **Neon** (PostgreSQL).
+
+See `docs/DEPLOYMENT.md` for full instructions.
+
 ## 🐳 Docker Usage
 
 ```bash
@@ -56,6 +66,7 @@ python -m pytest
 ## 📄 Documentation
 
 See the `docs/` folder for detailed specifications and guides:
+- `docs/DEPLOYMENT.md`: Deployment instructions for Koyeb, Railway, Vercel.
 - `docs/BURNS_BAROMETER_SPEC.md`: System architecture and design.
 - `docs/BURNS_MASTER_RESUME_SOURCE.md`: Source of truth for resume generation.
 - `docs/02_COMPLETE_GUIDE.md`: Framework methodology.
