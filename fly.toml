@@ -7,26 +7,10 @@ primary_region = "sea"
 [env]
   CLOUD_MODE = "true" # Triggers scheduler mode
 
-[[services]]
-  protocol = "tcp"
-  internal_port = 8000
-  processes = ["app"]
-
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-    force_https = true
-
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"]
-
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 25
-    soft_limit = 20
-
 [[vm]]
-  memory = "1gb" # Increased from default 256mb for Playwright/WeasyPrint
+  memory = "1gb"
   cpu_kind = "shared"
   cpus = 1
+
+# Worker configuration (No services block means no public IP/ports)
+# This prevents Fly from failing health checks on port 8080
