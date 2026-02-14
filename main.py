@@ -98,6 +98,7 @@ class BurnsBarometer:
         except Exception as e:
             logger.error(f"Cycle failed: {e}")
             sentry_sdk.capture_exception(e)
+            # Don't re-raise, let the scheduler continue
         
         logger.info("=== Burns Barometer Cycle Complete ===")
     
@@ -106,9 +107,13 @@ class BurnsBarometer:
         self.db.close()
 
 def job():
-    barometer = BurnsBarometer()
-    barometer.run_full_cycle()
-    barometer.cleanup()
+    try:
+        barometer = BurnsBarometer()
+        barometer.run_full_cycle()
+        barometer.cleanup()
+    except Exception as e:
+        logger.error(f"Critical Job Error: {e}")
+        sentry_sdk.capture_exception(e)
 
 if __name__ == "__main__":
     # Ensure storage directories exist
@@ -117,14 +122,23 @@ if __name__ == "__main__":
     # If running on Cloud (Koyeb/Railway/Fly), use scheduler
     if os.getenv("CLOUD_MODE"):
         logger.info("Starting Scheduler for Cloud Mode...")
+        
         # Run once immediately
         job()
+        
         # Then schedule every 6 hours
         schedule.every(6).hours.do(job)
         
         while True:
-            schedule.run_pending()
-            time.sleep(60)
+            try:
+                schedule.run_pending()
+                time.sleep(60)
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                logger.error(f"Scheduler loop error: {e}")
+                sentry_sdk.capture_exception(e)
+                time.sleep(60) # Prevent tight loop on crash
     else:
         # Local run
         job()
