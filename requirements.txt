@@ -30,6 +30,9 @@ jinja2>=3.1.0
 markdown>=3.5.0
 weasyprint>=60.0
 
+# Monitoring
+sentry-sdk>=1.40.0
+
 # API / Web Server (for Gatekeeper UI/API)
 fastapi>=0.109.0
 uvicorn>=0.27.0

@@ -3,6 +3,7 @@ import os
 import yaml
 import time
 import schedule
+import sentry_sdk
 from dotenv import load_dotenv
 from db.manager import DatabaseManager
 from utils.llm_client import LLMClient
@@ -14,6 +15,14 @@ from agents.gatekeeper import Gatekeeper
 
 # Load environment variables
 load_dotenv()
+
+# Initialize Sentry if DSN is present
+if os.getenv("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 # Configure logging
 logging.basicConfig(
@@ -37,6 +46,7 @@ class BurnsBarometer:
             logger.info("LLM Client initialized successfully.")
         except Exception as e:
             logger.error(f"Failed to initialize LLM Client: {e}")
+            sentry_sdk.capture_exception(e)
             self.llm = None
         
         # Initialize agents
@@ -61,44 +71,33 @@ class BurnsBarometer:
         """Execute one complete cycle: Scout -> Barometer -> Mirror -> Tribunal -> Gatekeeper."""
         logger.info("=== Burns Barometer Cycle Started ===")
         
-        # 1. Scout
-        if self.scout:
-            try:
+        try:
+            # 1. Scout
+            if self.scout:
                 self.scout.run_mission()
-            except Exception as e:
-                logger.error(f"Scout mission failed: {e}")
-        
-        # 2. Barometer
-        if self.barometer:
-            try:
+            
+            # 2. Barometer
+            if self.barometer:
                 self.barometer.run_analysis_cycle()
-            except Exception as e:
-                logger.error(f"Barometer cycle failed: {e}")
-                
-        # 3. Mirror
-        if self.mirror:
-            try:
+                    
+            # 3. Mirror
+            if self.mirror:
                 self.mirror.run_generation_cycle()
-            except Exception as e:
-                logger.error(f"Mirror cycle failed: {e}")
 
-        # 4. Tribunal
-        if self.tribunal:
-            try:
+            # 4. Tribunal
+            if self.tribunal:
                 self.tribunal.run_review_cycle(self.mirror)
-            except Exception as e:
-                logger.error(f"Tribunal cycle failed: {e}")
-        
-        # 5. Gatekeeper (Interactive - only if running locally)
-        # On Cloud (Koyeb/Railway/Fly), we skip this blocking step and rely on the API to view results.
-        if os.getenv("CLOUD_MODE") is None:
-            if self.gatekeeper:
-                try:
+            
+            # 5. Gatekeeper (Interactive - only if running locally)
+            if os.getenv("CLOUD_MODE") is None:
+                if self.gatekeeper:
                     self.gatekeeper.request_approval()
-                except Exception as e:
-                    logger.error(f"Gatekeeper session failed: {e}")
-        else:
-            logger.info("Running in CLOUD_MODE: Skipping interactive Gatekeeper.")
+            else:
+                logger.info("Running in CLOUD_MODE: Skipping interactive Gatekeeper.")
+                
+        except Exception as e:
+            logger.error(f"Cycle failed: {e}")
+            sentry_sdk.capture_exception(e)
         
         logger.info("=== Burns Barometer Cycle Complete ===")
     
