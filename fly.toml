@@ -1,15 +1,15 @@
-app = "burns-barometer"
+app = "burnsbaramator" # Fixed app name to match Fly.io
 primary_region = "sea"
 
 [build]
   dockerfile = "Dockerfile"
 
 [env]
-  CLOUD_MODE = "true" # Explicitly set for Fly.io to trigger scheduler
+  CLOUD_MODE = "true" # Triggers scheduler mode
 
 [[vm]]
   memory = "1gb"
   cpu_kind = "shared"
   cpus = 1
 
-# No [[services]] block = Worker Mode (No HTTP checks)
+# No [[services]] block = Worker Mode
