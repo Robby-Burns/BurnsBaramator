@@ -64,8 +64,19 @@ class BurnsBarometer:
         self.gatekeeper = Gatekeeper(self.db)
     
     def _load_config(self, path: str):
-        with open(path, 'r') as f:
-            return yaml.safe_load(f)
+        try:
+            with open(path, 'r') as f:
+                return yaml.safe_load(f)
+        except FileNotFoundError:
+            logger.error(f"Config file not found: {path}")
+            logger.info("Using default configuration")
+            return {
+                "settings": {
+                    "job_title": os.getenv("JOB_TITLE", "Software Engineer"),
+                    "industries": os.getenv("INDUSTRIES", "Technology").split(","),
+                    "locations": os.getenv("LOCATIONS", "Remote").split(",")
+                }
+            }
 
     def run_full_cycle(self):
         """Execute one complete cycle: Scout -> Barometer -> Mirror -> Tribunal -> Gatekeeper."""
@@ -107,13 +118,21 @@ class BurnsBarometer:
         self.db.close()
 
 def job():
+    """Wrapped job function with full error handling."""
     try:
+        logger.info("Starting job execution...")
         barometer = BurnsBarometer()
         barometer.run_full_cycle()
         barometer.cleanup()
+        logger.info("Job completed successfully")
     except Exception as e:
         logger.error(f"Critical Job Error: {e}")
         sentry_sdk.capture_exception(e)
+        # Don't re-raise - let the scheduler continue
+
+def health_check():
+    """Simple health check that runs periodically."""
+    logger.info("Health check: Worker is alive")
 
 if __name__ == "__main__":
     # Ensure storage directories exist
@@ -124,24 +143,43 @@ if __name__ == "__main__":
     
     if is_cloud:
         logger.info("Starting Scheduler for Cloud Mode (24/7)...")
+        logger.info(f"CLOUD_MODE: {os.getenv('CLOUD_MODE')}")
+        logger.info(f"DATABASE_URL: {'SET' if os.getenv('DATABASE_URL') else 'NOT SET'}")
+        logger.info(f"ANTHROPIC_API_KEY: {'SET' if os.getenv('ANTHROPIC_API_KEY') else 'NOT SET'}")
         
-        # Run once immediately on startup
-        job()
-        
-        # Then schedule every 6 hours
+        # Schedule the job every 6 hours
         schedule.every(6).hours.do(job)
         
-        # Keep alive loop
+        # Schedule health check every 5 minutes
+        schedule.every(5).minutes.do(health_check)
+        
+        # Keep alive loop - run job on first iteration
+        first_run = True
+        logger.info("Entering keep-alive loop...")
+        
         while True:
             try:
+                # Run job immediately on startup
+                if first_run:
+                    logger.info("Running initial job...")
+                    job()
+                    first_run = False
+                
+                # Run pending scheduled jobs
                 schedule.run_pending()
-                time.sleep(60)
+                time.sleep(60)  # Check every minute
+                
             except KeyboardInterrupt:
+                logger.info("Shutdown signal received")
                 break
             except Exception as e:
                 logger.error(f"Scheduler loop error: {e}")
                 sentry_sdk.capture_exception(e)
+                # Don't crash - keep the loop running
                 time.sleep(60)
+        
+        logger.info("Scheduler stopped")
+
     else:
         # Local run (Run once and exit)
         logger.info("Starting Local Run...")
