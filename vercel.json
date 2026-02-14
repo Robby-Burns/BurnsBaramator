@@ -1,6 +1,0 @@
-{
-  "buildCommand": "pip install -r requirements-vercel.txt --break-system-packages",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "api/index.py" }
-  ]
-}
