@@ -5,12 +5,11 @@ primary_region = "sea"
   dockerfile = "Dockerfile"
 
 [env]
-  CLOUD_MODE = "true" # Triggers scheduler mode
+  CLOUD_MODE = "true" # Explicitly set for Fly.io to trigger scheduler
 
 [[vm]]
   memory = "1gb"
   cpu_kind = "shared"
   cpus = 1
 
-# Worker configuration (No services block means no public IP/ports)
-# This prevents Fly from failing health checks on port 8080
+# No [[services]] block = Worker Mode (No HTTP checks)

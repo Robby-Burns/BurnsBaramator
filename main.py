@@ -89,6 +89,7 @@ class BurnsBarometer:
                 self.tribunal.run_review_cycle(self.mirror)
             
             # 5. Gatekeeper (Interactive - only if running locally)
+            # On Cloud, we skip this blocking step.
             if os.getenv("CLOUD_MODE") is None:
                 if self.gatekeeper:
                     self.gatekeeper.request_approval()
@@ -98,7 +99,6 @@ class BurnsBarometer:
         except Exception as e:
             logger.error(f"Cycle failed: {e}")
             sentry_sdk.capture_exception(e)
-            # Don't re-raise, let the scheduler continue
         
         logger.info("=== Burns Barometer Cycle Complete ===")
     
@@ -119,16 +119,19 @@ if __name__ == "__main__":
     # Ensure storage directories exist
     os.makedirs("storage/logs", exist_ok=True)
     
-    # If running on Cloud (Koyeb/Railway/Fly), use scheduler
-    if os.getenv("CLOUD_MODE"):
-        logger.info("Starting Scheduler for Cloud Mode...")
+    # Check for CLOUD_MODE (set in Fly.io/Railway env vars)
+    is_cloud = os.getenv("CLOUD_MODE", "false").lower() == "true"
+    
+    if is_cloud:
+        logger.info("Starting Scheduler for Cloud Mode (24/7)...")
         
-        # Run once immediately
+        # Run once immediately on startup
         job()
         
         # Then schedule every 6 hours
         schedule.every(6).hours.do(job)
         
+        # Keep alive loop
         while True:
             try:
                 schedule.run_pending()
@@ -138,7 +141,9 @@ if __name__ == "__main__":
             except Exception as e:
                 logger.error(f"Scheduler loop error: {e}")
                 sentry_sdk.capture_exception(e)
-                time.sleep(60) # Prevent tight loop on crash
+                time.sleep(60)
     else:
-        # Local run
+        # Local run (Run once and exit)
+        logger.info("Starting Local Run...")
         job()
+        logger.info("Local Run Complete.")
